@@ -1,27 +1,12 @@
-require 'optparse'
 require 'mail'
+require 'yaml'
 
-OptionParser.new do |opts|
-  opts.banner = "Usage: secret_santa.rb [options]"
-  opts.on("-m", "--mailhost MAILHOST", "Mailhost") do |m|
-    @mailhost = m
-  end
-  opts.on("-f", "--from EMAILADDRESS", "From Email Address") do |e|
-    @from_email = e
-  end
-  opts.on("-d", "--data FILE", "Data File") do |f|
-    @data_file = f
-  end
-  opts.on("-u", "--username USERNAME", "GMail Username") do |u|
-    @username = u
-  end
-  opts.on("-p", "--password PASSWORD", "GMail Password") do |p|
-    @password = p
-  end
-  opts.on("-h", "--domain", "Sending domain") do |d|
-    @domain = d
-  end
-end.parse!
+config = YAML.load(File.open(ARGV[0]))
+@from_email = config['gmail']['from']
+@username   = config['gmail']['username']
+@password   = config['gmail']['password']
+@domain     = config['gmail']['domain']
+@data       = config['santas']
 
 mail_options = {
   address: 'smtp.gmail.com',
@@ -40,7 +25,7 @@ end
 
 emails = {}
 @family = []
-File.readlines(@data_file).each do |line|
+@data.each do |line|
   name, email = line.split('|')
   @family << name
   emails[name] = email
