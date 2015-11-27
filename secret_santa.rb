@@ -1,6 +1,8 @@
 require 'mail'
 require 'yaml'
 
+# Setup necessary data
+
 config = YAML.load(File.open(ARGV[0]))
 @from_email = config['gmail']['from']
 @username   = config['gmail']['username']
@@ -31,6 +33,9 @@ emails = {}
   emails[name] = email
 end
 
+
+# Some helpful functions
+
 def reset!
   @givers = @family.dup
   @receivers = @family.dup
@@ -47,8 +52,9 @@ def failed?
   available.size == 1 || (available.size == 2 && partners?(*available))
 end 
 
-reset!
 
+# Do the picking
+reset!
 while !@givers.empty?
   reset! if failed?
   giver = @givers.shift
@@ -62,6 +68,7 @@ while !@givers.empty?
   end
 end
 
+# Send the emails
 from_email = @from_email
 @buyers.each do |giver, receiver|
   mail = Mail.new do
